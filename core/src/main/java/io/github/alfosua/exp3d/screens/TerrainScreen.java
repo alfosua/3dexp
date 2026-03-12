@@ -57,8 +57,8 @@ public class TerrainScreen extends Base3DScreen {
                 Vector3 v3 = new Vector3((x + 1) * scale, heights[x + 1][z + 1], (z + 1) * scale);
                 Vector3 v4 = new Vector3(x * scale, heights[x][z + 1], (z + 1) * scale);
 
-                builder.triangle(v1, v2, v3);
-                builder.triangle(v1, v3, v4);
+                builder.triangle(v1, v3, v2);
+                builder.triangle(v1, v4, v3);
             }
         }
 

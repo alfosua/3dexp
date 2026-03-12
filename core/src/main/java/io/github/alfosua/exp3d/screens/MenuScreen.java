@@ -9,7 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.graphics.Color;
 import io.github.alfosua.exp3d.Main;
 
 public class MenuScreen extends ScreenAdapter {
@@ -35,19 +37,34 @@ public class MenuScreen extends ScreenAdapter {
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.font = game.font;
 
+        Table rootTable = new Table();
+        rootTable.setFillParent(true);
+        stage.addActor(rootTable);
+
         Table table = new Table();
-        table.setFillParent(true);
-        stage.addActor(table);
 
         String[] examples = {
+            "-- Basics --",
             "1. Simple 3D model rendering",
-            "2. Simple FPS camera",
+            "2. Simple GLTF scene",
             "3. Simple 3D animation",
-            "4. Custom Shader",
-            "5. Custom model generation",
-            "6. Terrain rendering with heightmaps",
-            "7. Realistic rendering with GLTF",
-            "8. Simple Physics sandbox with Bullet"
+            "4. Simple FPS camera",
+            "-- Procedural --",
+            "5. Model Builders (Procedural)",
+            "6. Custom model generation",
+            "7. Terrain rendering with heightmaps",
+            "-- Lighting --",
+            "8. Lighting Types",
+            "9. Shadows",
+            "10. Environment Skybox",
+            "11. PBR Reflections (IBL)",
+            "-- Shaders & Rendering --",
+            "12. Realistic rendering with GLTF",
+            "13. Custom Shader",
+            "14. Cell Shaded Anime Character",
+            "-- Advanced Environments --",
+            "15. Simple Physics sandbox with Bullet",
+            "16. Large Environment Exploration"
         };
         
         com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle labelStyle = new com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle();
@@ -57,6 +74,12 @@ public class MenuScreen extends ScreenAdapter {
 
         for (int i = 0; i < examples.length; i++) {
             final int index = i;
+            if (examples[i].startsWith("--")) {
+                com.badlogic.gdx.scenes.scene2d.ui.Label label = new com.badlogic.gdx.scenes.scene2d.ui.Label(examples[i], labelStyle);
+                label.setColor(Color.SCARLET);
+                table.add(label).padTop(10).padBottom(5).row();
+                continue;
+            }
             TextButton button = new TextButton(examples[i], textButtonStyle);
             button.addListener(new ChangeListener() {
                 @Override
@@ -64,8 +87,14 @@ public class MenuScreen extends ScreenAdapter {
                     launchExample(index);
                 }
             });
-            table.add(button).pad(5).row();
+            table.add(button).pad(2).row();
         }
+        
+        ScrollPane scrollPane = new ScrollPane(table);
+        scrollPane.setFadeScrollBars(false);
+        scrollPane.setScrollingDisabled(true, false); // Disable horizontal scrolling
+        
+        rootTable.add(scrollPane).fill().expand().padBottom(10).row();
         
         TextButton exitButton = new TextButton("Exit", textButtonStyle);
         exitButton.addListener(new ChangeListener() {
@@ -74,37 +103,29 @@ public class MenuScreen extends ScreenAdapter {
                 Gdx.app.exit();
             }
         });
-        table.add(exitButton).padTop(20).row();
+        rootTable.add(exitButton).padBottom(20).row();
     }
 
     private void launchExample(int index) {
         // We will implement these one by one.
         com.badlogic.gdx.Screen nextScreen = null;
         switch (index) {
-            case 0:
-                nextScreen = new SimpleModelScreen(game);
-                break;
-            case 1:
-                nextScreen = new FpsCameraScreen(game);
-                break;
-            case 2:
-                nextScreen = new AnimationScreen(game);
-                break;
-            case 3:
-                nextScreen = new CustomShaderScreen(game);
-                break;
-            case 4:
-                nextScreen = new CustomModelScreen(game);
-                break;
-            case 5:
-                nextScreen = new TerrainScreen(game);
-                break;
-            case 6:
-                nextScreen = new PbrGltfScreen(game);
-                break;
-            case 7:
-                nextScreen = new PhysicsScreen(game);
-                break;
+            case 1: nextScreen = new SimpleModelScreen(game); break;
+            case 2: nextScreen = new SimpleGltfScreen(game); break;
+            case 3: nextScreen = new AnimationScreen(game); break;
+            case 4: nextScreen = new FpsCameraScreen(game); break;
+            case 6: nextScreen = new ModelBuildersScreen(game); break;
+            case 7: nextScreen = new CustomModelScreen(game); break;
+            case 8: nextScreen = new TerrainScreen(game); break;
+            case 10: nextScreen = new LightingScreen(game); break;
+            case 11: nextScreen = new ShadowsScreen(game); break;
+            case 12: nextScreen = new SkyboxScreen(game); break;
+            case 13: nextScreen = new ReflectionScreen(game); break;
+            case 15: nextScreen = new PbrGltfScreen(game); break;
+            case 16: nextScreen = new CustomShaderScreen(game); break;
+            case 17: nextScreen = new CellShadingScreen(game); break;
+            case 19: nextScreen = new PhysicsScreen(game); break;
+            case 20: nextScreen = new EnvironmentScreen(game); break;
         }
         if (nextScreen != null) {
             game.getScreen().dispose();

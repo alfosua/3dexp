@@ -3,21 +3,17 @@ package io.github.alfosua.exp3d.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
-import net.mgsx.gltf.scene3d.attributes.PBRFloatAttribute;
+import io.github.alfosua.exp3d.Main;
 import net.mgsx.gltf.scene3d.lights.DirectionalLightEx;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
-import io.github.alfosua.exp3d.Main;
+import net.mgsx.gltf.loaders.glb.GLBLoader;
+import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class PbrGltfScreen extends Base3DScreen {
     private SceneManager sceneManager;
-    private Model metalModel;
-    private Model plasticModel;
+    private SceneAsset sceneAsset;
+    private Scene scene;
 
     public PbrGltfScreen(Main game) {
         super(game);
@@ -31,33 +27,14 @@ public class PbrGltfScreen extends Base3DScreen {
         light.color.set(Color.WHITE);
         sceneManager.environment.add(light);
 
-        ModelBuilder modelBuilder = new ModelBuilder();
+        sceneManager.setAmbientLight(1f);
 
-        // High metallic, low roughness (Shiny Gold)
-        Material metalMat = new Material(
-                PBRColorAttribute.createBaseColorFactor(Color.GOLD),
-                PBRFloatAttribute.createMetallic(1.0f),
-                PBRFloatAttribute.createRoughness(0.2f)
-        );
-        metalModel = modelBuilder.createSphere(5f, 5f, 5f, 32, 32, metalMat,
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        Scene metalScene = new Scene(metalModel);
-        metalScene.modelInstance.transform.setToTranslation(-4, 0, 0);
-        sceneManager.addScene(metalScene);
+        // Load photorealistic model
+        sceneAsset = new GLBLoader().load(Gdx.files.internal("DamagedHelmet.glb"));
+        scene = new Scene(sceneAsset.scene);
+        sceneManager.addScene(scene);
 
-        // Low metallic, high roughness (Matte Red Plastic)
-        Material plasticMat = new Material(
-                PBRColorAttribute.createBaseColorFactor(Color.RED),
-                PBRFloatAttribute.createMetallic(0.0f),
-                PBRFloatAttribute.createRoughness(0.8f)
-        );
-        plasticModel = modelBuilder.createSphere(5f, 5f, 5f, 32, 32, plasticMat,
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        Scene plasticScene = new Scene(plasticModel);
-        plasticScene.modelInstance.transform.setToTranslation(4, 0, 0);
-        sceneManager.addScene(plasticScene);
-
-        cam.position.set(0f, 0f, 15f);
+        cam.position.set(0f, 0f, 3f);
         cam.lookAt(0, 0, 0);
         cam.update();
     }
@@ -90,13 +67,9 @@ public class PbrGltfScreen extends Base3DScreen {
             sceneManager.dispose();
             sceneManager = null;
         }
-        if (metalModel != null) {
-            metalModel.dispose();
-            metalModel = null;
-        }
-        if (plasticModel != null) {
-            plasticModel.dispose();
-            plasticModel = null;
+        if (sceneAsset != null) {
+            sceneAsset.dispose();
+            sceneAsset = null;
         }
         super.dispose();
     }
