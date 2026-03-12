@@ -30,22 +30,22 @@ public class LightingScreen extends Base3DScreen {
         cam.lookAt(0, 0, 0);
         cam.update();
 
-        // Override environment from Base3DScreen to test lights
+        // Sobrescribir el entorno de Base3DScreen para probar las luces
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.1f, 0.1f, 0.1f, 1f));
 
-        // 1. Directional Light (Sun-like, mostly blueish light)
+        // 1. Luz Direccional (Como el sol, luz mayormente azulada)
         environment.add(new DirectionalLight().set(0.2f, 0.2f, 0.5f, -1f, -0.8f, -0.2f));
 
-        // 2. Point Light (Omnidirectional, like a lightbulb) - Reddish
+        // 2. Luz Puntual (Omnidireccional, como una bombilla) - Rojiza
         environment.add(new PointLight().set(1f, 0f, 0f, -4f, 2f, 4f, 20f));
 
-        // 3. Spot Light (Cone-shaped) - Greenish
+        // 3. Luz Foco (En forma de cono) - Verdosa
         environment.add(new SpotLight().set(0f, 1f, 0f, 4f, 5f, 0f, 0f, -1f, 0f, 20f, 10f, 25f));
 
         ModelBuilder modelBuilder = new ModelBuilder();
 
-        // Floor
+        // Suelo
         Material floorMaterial = new Material(ColorAttribute.createDiffuse(Color.WHITE));
         Model floor = modelBuilder.createBox(20f, 0.5f, 20f, floorMaterial, Usage.Position | Usage.Normal);
         ModelInstance floorInstance = new ModelInstance(floor);
@@ -53,7 +53,7 @@ public class LightingScreen extends Base3DScreen {
         models.add(floor);
         instances.add(floorInstance);
 
-        // A few objects to catch light
+        // Algunos objetos para atrapar la luz
         Material objMaterial = new Material(ColorAttribute.createDiffuse(Color.LIGHT_GRAY));
         
         Model box = modelBuilder.createBox(2f, 2f, 2f, objMaterial, Usage.Position | Usage.Normal);

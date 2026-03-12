@@ -23,6 +23,9 @@ import net.mgsx.gltf.scene3d.scene.SceneSkybox;
 import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider;
 import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider;
 import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
+import com.badlogic.gdx.graphics.g3d.Material;
+import net.mgsx.gltf.scene3d.attributes.PBRFloatAttribute;
+import net.mgsx.gltf.scene3d.lights.SpotLightEx;
 import io.github.alfosua.exp3d.Main;
 
 public class EnvironmentScreen extends Base3DScreen {
@@ -30,7 +33,7 @@ public class EnvironmentScreen extends Base3DScreen {
     private SceneAsset sceneAsset;
     private Scene scene;
 
-    // Physics
+    // Físicas
     private btCollisionConfiguration collisionConfig;
     private btDispatcher dispatcher;
     private btBroadphaseInterface broadphase;
@@ -49,7 +52,7 @@ public class EnvironmentScreen extends Base3DScreen {
     private btRigidBody playerBody;
     private btRigidBody.btRigidBodyConstructionInfo playerInfo;
 
-    // Environment
+    // Entorno
     private Cubemap cubemap;
     private SceneSkybox skybox;
     private DirectionalShadowLight shadowLight;
@@ -66,103 +69,100 @@ public class EnvironmentScreen extends Base3DScreen {
         sceneManager = new SceneManager(new PBRShaderProvider(config), new PBRDepthShaderProvider(depthConfig));
         sceneManager.setCamera(cam);
 
-        // --- ENVIRONMENT, LIGHTS, AND IBL ---
-        sceneManager.setAmbientLight(0.05f); // Very dark ambient for night time
+        // --- ENTORNO, LUCES E IBL ---
+        sceneManager.setAmbientLight(0.05f); // Luz ambiental muy oscura para la noche
 
-        // Convert point lights to SpotLights because standard PointLights do not cast shadows in gdx-gltf
-        net.mgsx.gltf.scene3d.lights.SpotLightEx spot1 = new net.mgsx.gltf.scene3d.lights.SpotLightEx();
-        // Realistic pale yellow (warm incandescent), lower intensity (from 100f to 40f)
+        // Convertir luces puntuales a SpotLights
+        SpotLightEx spot1 = new SpotLightEx();
+        // Amarillo pálido realista (incandescente cálido), menor intensidad (de 100f a 40f)
         spot1.set(1.0f, 0.9f, 0.7f, 8f, 5f, 0f, 0f, -1f, 0f, 40f, 60f, 1f);
         sceneManager.environment.add(spot1);
 
-        net.mgsx.gltf.scene3d.lights.SpotLightEx spot2 = new net.mgsx.gltf.scene3d.lights.SpotLightEx();
+        SpotLightEx spot2 = new SpotLightEx();
         spot2.set(1.0f, 0.9f, 0.7f, -8f, 5f, 0f, 0f, -1f, 0f, 40f, 60f, 1f);
         sceneManager.environment.add(spot2);
 
-        // Wide shadow map for Sponza courtyard moonlight
+        // Amplio mapa de sombras para la luz de la luna en el patio de Sponza
         shadowLight = new DirectionalShadowLight(2048, 2048, 120f, 120f, 1f, 300f);
-        shadowLight.set(0.4f, 0.5f, 0.7f, 0.5f, -1f, 0.2f); // Blueish moonlight, shining down diagonally
+        shadowLight.set(0.4f, 0.5f, 0.7f, 0.5f, -1f, 0.2f); // Luz de luna azulada, brillando en diagonal hacia abajo
         sceneManager.environment.add(shadowLight);
         sceneManager.environment.shadowMap = shadowLight;
 
-        // Dark procedural night skybox
+        // Skybox nocturno procedural oscuro
         Pixmap pSky = new Pixmap(256, 256, Pixmap.Format.RGBA8888);
-        pSky.setColor(0.02f, 0.02f, 0.06f, 1f); // Midnight blue
+        pSky.setColor(0.02f, 0.02f, 0.06f, 1f); // Azul medianoche
         pSky.fill();
         
-        // Add a few simple white stars to the night sky
+        // Añadir algunas estrellas blancas simples al cielo nocturno
         pSky.setColor(Color.WHITE);
         for(int i = 0; i < 50; i++) {
             pSky.drawPixel((int)(Math.random() * 256), (int)(Math.random() * 256));
         }
 
         Pixmap pGround = new Pixmap(256, 256, Pixmap.Format.RGBA8888);
-        pGround.setColor(0.01f, 0.01f, 0.01f, 1f); // Pitch black floor
+        pGround.setColor(0.01f, 0.01f, 0.01f, 1f); // Suelo negro intenso
         pGround.fill();
 
         cubemap = new Cubemap(pSky, pSky, pSky, pGround, pSky, pSky);
         skybox = new SceneSkybox(cubemap);
         sceneManager.setSkyBox(skybox);
 
-        // --- LOAD SCENE ---
+        // --- CARGAR ESCENA ---
         sceneAsset = new GLBLoader().load(Gdx.files.internal("Sponza.glb"));
         scene = new Scene(sceneAsset.scene);
 
-        // Prevent Sponza itself from looking shiny so it looks like stone,
-        // while allowing our gold sphere to use the global IBL reflections
-        // Prevent Sponza itself from looking shiny so it looks like stone,
-        // while allowing our gold sphere to use the global IBL reflections
-        for (com.badlogic.gdx.graphics.g3d.Material m : scene.modelInstance.materials) {
-            // Give Sponza a fake custom attribute so we know NOT to apply global env
-            m.set(net.mgsx.gltf.scene3d.attributes.PBRFloatAttribute.createRoughness(1.0f));
-            m.set(net.mgsx.gltf.scene3d.attributes.PBRFloatAttribute.createMetallic(0.0f));
+        // Evitar que Sponza brille, para que parezca piedra
+        for (Material m : scene.modelInstance.materials) {
+            // Establecer rugosidad y metallic en los materiales
+            m.set(PBRFloatAttribute.createRoughness(1.0f));
+            m.set(PBRFloatAttribute.createMetallic(0.0f));
         }
 
         sceneManager.addScene(scene);
 
-        // --- BULLET PHYSICS SETUP ---
+        // --- CONFIGURACIÓN DE FÍSICAS BULLET ---
         Bullet.init();
         collisionConfig = new btDefaultCollisionConfiguration();
         dispatcher = new btCollisionDispatcher(collisionConfig);
         broadphase = new btDbvtBroadphase();
         solver = new btSequentialImpulseConstraintSolver();
         dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
-        dynamicsWorld.setGravity(new Vector3(0, -20f, 0)); // Stronger gravity feels better
+        dynamicsWorld.setGravity(new Vector3(0, -20f, 0)); // Gravedad más fuerte para mejor sensación
 
-        // 1. Static Mesh Collider for Sponza
+        // 1. Colisionador de malla estática para Sponza
         sponzaShape = Bullet.obtainStaticNodeShape(scene.modelInstance.nodes);
         sponzaInfo = new btRigidBody.btRigidBodyConstructionInfo(0, null, sponzaShape, Vector3.Zero);
         sponzaBody = new btRigidBody(sponzaInfo);
         dynamicsWorld.addRigidBody(sponzaBody);
 
-        // 1.5 Solid Floor Plane (Fail-safe) - MASSIVELY THICK to prevent any high velocity clipping
-        groundShape = new btBoxShape(new Vector3(200f, 10f, 200f)); // 20 units thick
+        // 1.5 Plano de suelo sólido (Prueba de fallos) - MASIVAMENTE GRUESO para evitar recortes a alta velocidad
+        groundShape = new btBoxShape(new Vector3(200f, 10f, 200f)); // 20 unidades de grosor
         groundInfo = new btRigidBody.btRigidBodyConstructionInfo(0f, null, groundShape, Vector3.Zero);
         groundBody = new btRigidBody(groundInfo);
-        groundBody.setWorldTransform(new Matrix4().setToTranslation(0f, -10.05f, 0f)); // Top edge rests exactly at Y=-0.05
+        groundBody.setWorldTransform(new Matrix4().setToTranslation(0f, -10.05f, 0f)); // Borde superior descansa exactamente en Y=-0.05
         dynamicsWorld.addRigidBody(groundBody);
 
-        // 2. Dynamic Player Collider (Capsule)
-        playerShape = new btCapsuleShape(0.5f, 1.0f); // 2m tall capsule
+        // 2. Colisionador dinámico del jugador (Cápsula)
+        playerShape = new btCapsuleShape(0.5f, 1.0f); // Cápsula de 2m de altura
         Vector3 localInertia = new Vector3();
-        playerShape.calculateLocalInertia(60f, localInertia); // 60kg person
+        playerShape.calculateLocalInertia(60f, localInertia); // Persona de 60kg
         playerInfo = new btRigidBody.btRigidBodyConstructionInfo(60f, null, playerShape, localInertia);
         playerBody = new btRigidBody(playerInfo);
 
-        // Prevent player from tipping over
+        // Evitar que el jugador se vuelque
         playerBody.setAngularFactor(Vector3.Zero);
         playerBody.setActivationState(Collision.DISABLE_DEACTIVATION);
 
-        // Enable Continuous Collision Detection (CCD) to prevent falling through Sponza floor
+        // Habilitar la detección continua de colisiones (CCD) para evitar caer por el suelo de Sponza
         playerBody.setCcdMotionThreshold(1e-7f);
         playerBody.setCcdSweptSphereRadius(0.5f);
 
-        // Start position lowered and offset to look at sphere
+        // Posición de inicio bajada y desplazada
         Matrix4 startTransform = new Matrix4().setToTranslation(0f, 5f, 5f);
         playerBody.setWorldTransform(startTransform);
         dynamicsWorld.addRigidBody(playerBody);
 
-        // Initialize camera
+        // Inicializar cámara
         cam.position.set(0f, 5f, 5f);
         cam.lookAt(0f, 5f, 0f);
         cam.up.set(0, 1, 0);
@@ -173,7 +173,7 @@ public class EnvironmentScreen extends Base3DScreen {
 
     @Override
     public void show() {
-        super.show(); // Sets up multiplexer with escape key
+        super.show(); // Configura el multiplexor con la tecla escape
         Gdx.input.setCursorCatched(true);
     }
 
@@ -191,7 +191,7 @@ public class EnvironmentScreen extends Base3DScreen {
             return;
         }
 
-        // --- FPS CAMERA LOOK (Mouse) ---
+        // --- VISTA DE CÁMARA FPS (Ratón) ---
         float lookSpeed = 0.2f;
         float deltaX = -Gdx.input.getDeltaX() * lookSpeed;
         float deltaY = -Gdx.input.getDeltaY() * lookSpeed;
@@ -199,13 +199,13 @@ public class EnvironmentScreen extends Base3DScreen {
         cam.direction.rotate(cam.up, deltaX);
         Vector3 right = new Vector3(cam.direction).crs(cam.up).nor();
         cam.direction.rotate(right, deltaY);
-        // Prevent gimbal lock / extreme looking up/down
+        // Evitar el bloqueo de cardán / mirar arriba/abajo de forma extrema
         if (cam.direction.y > 0.9f) cam.direction.y = 0.9f;
         if (cam.direction.y < -0.9f) cam.direction.y = -0.9f;
         cam.direction.nor();
         cam.update();
 
-        // --- FPS PLAYER MOVEMENT (Keyboard to Physics) ---
+        // --- MOVIMIENTO FPS DEL JUGADOR (Teclado a Físicas) ---
         Vector3 vel = playerBody.getLinearVelocity();
         Vector3 forward = new Vector3(cam.direction.x, 0, cam.direction.z).nor();
         Vector3 rightMove = new Vector3(forward).crs(Vector3.Y).nor();
@@ -216,33 +216,33 @@ public class EnvironmentScreen extends Base3DScreen {
         if(Gdx.input.isKeyPressed(Input.Keys.D)) targetVel.add(rightMove);
         if(Gdx.input.isKeyPressed(Input.Keys.A)) targetVel.sub(rightMove);
 
-        // Movement Speed
+        // Velocidad de Movimiento
         targetVel.nor().scl(12f);
 
-        // Preserve jumping/falling Y velocity
+        // Conservar velocidad Y de salto/caída
         playerBody.setLinearVelocity(new Vector3(targetVel.x, vel.y, targetVel.z));
 
-        // Jump
+        // Salto
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            // Only jump if we are moving somewhat slowly on Y axis (primitive grounded check)
+            // Solo saltar si nos movemos algo lento en el eje Y (verificación primitiva de suelo)
             if (Math.abs(vel.y) < 0.1f) {
                 playerBody.applyCentralImpulse(new Vector3(0, 400f, 0));
             }
         }
 
-        // --- STEP PHYSICS ---
+        // --- PASO DE FÍSICAS ---
         dynamicsWorld.stepSimulation(delta, 5, 1f / 60f);
 
-        // --- SYNC CAMERA TO PLAYER BODY ---
+        // --- SINCRONIZAR CÁMARA AL CUERPO DEL JUGADOR ---
         Matrix4 transform = new Matrix4();
         playerBody.getWorldTransform(transform);
         Vector3 pos = new Vector3();
         transform.getTranslation(pos);
-        pos.y += 0.8f; // Move camera to the top of the capsule (Eye height)
+        pos.y += 0.8f; // Mover cámara a la parte superior de la cápsula (Altura de los ojos)
         cam.position.set(pos);
         cam.update();
 
-        // --- RENDERING ---
+        // --- RENDERIZADO ---
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 

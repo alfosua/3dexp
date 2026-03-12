@@ -21,7 +21,7 @@ public class AnimationScreen extends Base3DScreen {
         sceneManager = new SceneManager();
         sceneManager.setCamera(cam);
         
-        // Load GLTF
+        // Cargar GLTF
         sceneAsset = new GLTFLoader().load(Gdx.files.internal("BoxAnimated.gltf"));
         scene = new Scene(sceneAsset.scene);
         sceneManager.addScene(scene);
@@ -34,7 +34,7 @@ public class AnimationScreen extends Base3DScreen {
         cam.lookAt(0, 0, 0);
         cam.update();
 
-        // setup light
+        // configurar luz
         DirectionalLightEx light = new DirectionalLightEx();
         light.direction.set(1, -3, 1).nor();
         light.color.set(Color.WHITE);

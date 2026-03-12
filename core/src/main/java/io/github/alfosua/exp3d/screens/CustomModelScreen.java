@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.graphics.GL20;
 import io.github.alfosua.exp3d.Main;
 
 public class CustomModelScreen extends Base3DScreen {
@@ -21,11 +22,11 @@ public class CustomModelScreen extends Base3DScreen {
         modelBuilder.begin();
 
         MeshPartBuilder builder = modelBuilder.part("diamond",
-                com.badlogic.gdx.graphics.GL20.GL_TRIANGLES,
+                GL20.GL_TRIANGLES,
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.ColorUnpacked | VertexAttributes.Usage.Normal,
                 new Material());
 
-        // Top half
+        // Mitad superior
         builder.setColor(Color.CYAN);
         builder.triangle(
                 new Vector3(0, 5, 0),
@@ -54,7 +55,7 @@ public class CustomModelScreen extends Base3DScreen {
                 new Vector3(-5, 0, 5)
         );
 
-        // Bottom half
+        // Mitad inferior
         builder.setColor(Color.RED);
         builder.triangle(
                 new Vector3(0, -5, 0),
@@ -93,9 +94,9 @@ public class CustomModelScreen extends Base3DScreen {
 
     @Override
     public void render(float delta) {
-        super.render(delta); // clears screen
+        super.render(delta); // limpia la pantalla
 
-        // Slowly rotate the diamond
+        // Rota lentamente el diamante
         instance.transform.rotate(0, 1, 0, 30f * delta);
 
         modelBatch.begin(cam);

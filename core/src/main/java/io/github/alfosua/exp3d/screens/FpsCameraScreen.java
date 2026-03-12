@@ -22,7 +22,7 @@ public class FpsCameraScreen extends Base3DScreen {
 
         ModelBuilder modelBuilder = new ModelBuilder();
         
-        // Floor
+        // Suelo
         Model floorModel = modelBuilder.createBox(100f, 1f, 100f, 
                 new Material(ColorAttribute.createDiffuse(Color.GRAY)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
@@ -31,7 +31,7 @@ public class FpsCameraScreen extends Base3DScreen {
         floor.transform.setToTranslation(0, -0.5f, 0);
         instances.add(floor);
 
-        // Pillars
+        // Pilares
         Material pillarMaterial = new Material(ColorAttribute.createDiffuse(Color.BLUE));
         Model pillarModel = modelBuilder.createCylinder(2f, 10f, 2f, 16, pillarMaterial, 
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
@@ -39,7 +39,7 @@ public class FpsCameraScreen extends Base3DScreen {
 
         for (int x = -40; x <= 40; x += 20) {
             for (int z = -40; z <= 40; z += 20) {
-                if (x == 0 && z == 0) continue; // skip center
+                if (x == 0 && z == 0) continue; // saltar el centro
                 ModelInstance pillar = new ModelInstance(pillarModel);
                 pillar.transform.setToTranslation(x, 5f, z);
                 instances.add(pillar);
@@ -53,15 +53,15 @@ public class FpsCameraScreen extends Base3DScreen {
 
         camController = new FirstPersonCameraController(cam);
         camController.setDegreesPerPixel(0.5f);
-        camController.setVelocity(10f); // movement speed
+        camController.setVelocity(10f); // velocidad de movimiento
     }
 
     @Override
     public void show() {
-        super.show(); // Sets up multiplexer with escape key
+        super.show(); // Configura el multiplexor con la tecla escape
         multiplexer.addProcessor(camController);
         
-        // Hide mouse cursor for FPS feel
+        // Ocultar el cursor del ratón para sensación de FPS
         Gdx.input.setCursorCatched(true);
     }
 
@@ -73,7 +73,7 @@ public class FpsCameraScreen extends Base3DScreen {
 
     @Override
     public void render(float delta) {
-        super.render(delta); // clears screen
+        super.render(delta); // limpia la pantalla
 
         camController.update(delta);
 

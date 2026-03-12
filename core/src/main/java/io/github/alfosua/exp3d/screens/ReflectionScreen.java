@@ -38,7 +38,7 @@ public class ReflectionScreen extends Base3DScreen {
         sceneManager = new SceneManager();
         sceneManager.setCamera(cam);
 
-        // We make a checkerboard-like cubemap to actually see reflection distortions
+        // Hacemos un cubemap estilo tablero de ajedrez para ver realmente las distorsiones de la reflexión
         Pixmap p = new Pixmap(256, 256, Pixmap.Format.RGBA8888);
         for(int x=0; x<256; x+=64) {
             for(int y=0; y<256; y+=64) {
@@ -59,18 +59,18 @@ public class ReflectionScreen extends Base3DScreen {
         skybox = new SceneSkybox(cubemap);
         sceneManager.setSkyBox(skybox);
 
-        // Setup PBR image-based lighting environment reflections
+        // Configurar reflexiones de entorno de iluminación basada en imágenes PBR
         sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(cubemap));
-        // Provide diffuse ambient matching the cubemap
+        // Proporcionar ambiente difuso que coincida con el cubemap
         sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(cubemap));
 
-        sceneManager.setAmbientLight(0.02f); // reduce flat ambient light because IBL will provide lighting
+        sceneManager.setAmbientLight(0.02f); // reducir luz ambiental plana porque IBL proporcionará iluminación
 
         ModelBuilder modelBuilder = new ModelBuilder();
         Material mat = new Material();
         mat.set(PBRColorAttribute.createBaseColorFactor(Color.GOLD));
-        mat.set(PBRFloatAttribute.createMetallic(1.0f)); // 100% metallic like a mirror
-        mat.set(PBRFloatAttribute.createRoughness(0.1f)); // Slight roughness to avoid pure black artifacts
+        mat.set(PBRFloatAttribute.createMetallic(1.0f)); // 100% metálico como un espejo
+        mat.set(PBRFloatAttribute.createRoughness(0.1f)); // Ligera rugosidad para evitar artefactos negros puros
 
         sphere = modelBuilder.createSphere(2.5f, 2.5f, 2.5f, 40, 40, mat, Usage.Position | Usage.Normal);
         sceneManager.addScene(new Scene(new ModelInstance(sphere)));
@@ -81,7 +81,7 @@ public class ReflectionScreen extends Base3DScreen {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        // Rotate camera around to see the reflections warp
+        // Rotar la cámara alrededor para ver cómo se deforman las reflexiones
         cam.rotateAround(Vector3.Zero, Vector3.Y, 20f * delta);
         cam.update();
 

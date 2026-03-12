@@ -13,6 +13,7 @@ import net.mgsx.gltf.loaders.glb.GLBLoader;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
+import net.mgsx.gltf.scene3d.lights.DirectionalLightEx;
 import net.mgsx.gltf.scene3d.shaders.PBRDepthShaderProvider;
 import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
 import com.badlogic.gdx.graphics.g3d.shaders.DepthShader;
@@ -27,16 +28,16 @@ public class CellShadingScreen extends Base3DScreen {
     public CellShadingScreen(Main game) {
         super(game);
 
-        // Instead of writing a full custom GLSL toon shader that understands GLTF bones,
-        // We can override PBRShaderProvider and inject custom GLSL, or we can just 
-        // use a custom fragment shader snippet to posterize the output of the PBR shader.
-        // For a true "cell shading" example, we modify the fragment shader
-        // to posterize the final color. We inject a snippet at the end of the shader.
+        // En lugar de escribir un shader toon GLSL personalizado completo que entienda los huesos GLTF,
+        // Podemos anular PBRShaderProvider e inyectar GLSL personalizado, o simplemente podemos
+        // usar un fragmento de shader de fragmentos personalizado para posterizar la salida del shader PBR.
+        // Para un verdadero ejemplo de "cell shading", modificamos el shader de fragmentos
+        // para posterizar el color final. Inyectamos un fragmento al final del shader.
         PBRShaderConfig config = new PBRShaderConfig();
-        config.numBones = 60; // Miku model requires 52 bones
+        config.numBones = 60; // El modelo de Miku requiere 52 huesos
         
-        // We safely intercept the lighting color calculation without breaking GLSL `#if` block structure
-        String defaultFrag = net.mgsx.gltf.scene3d.shaders.PBRShaderProvider.getDefaultFragmentShader();
+        // Interceptamos de forma segura el cálculo del color de iluminación sin romper la estructura del bloque `#if` de GLSL
+        String defaultFrag = PBRShaderProvider.getDefaultFragmentShader();
         
         defaultFrag = defaultFrag.replace(
             "vec3 color = ambientColor + f_diffuse + f_specular;",
@@ -53,24 +54,24 @@ public class CellShadingScreen extends Base3DScreen {
         DepthShader.Config depthConfig = new DepthShader.Config();
         depthConfig.numBones = 60;
         
-        // Provide the custom config to the SceneManager
+        // Proporcionar la configuración personalizada al SceneManager
         sceneManager = new SceneManager(new PBRShaderProvider(config), new PBRDepthShaderProvider(depthConfig));
         sceneManager.setCamera(cam);
 
         sceneManager.setAmbientLight(0.4f);
         
-        net.mgsx.gltf.scene3d.lights.DirectionalLightEx light = new net.mgsx.gltf.scene3d.lights.DirectionalLightEx();
+        DirectionalLightEx light = new DirectionalLightEx();
         light.direction.set(1, -1, -0.5f).nor();
         light.color.set(Color.WHITE);
         sceneManager.environment.add(light);
 
-        // Note: VRM files are actually GLB files. We can use GLBLoader.
-        // However, gdx-gltf throws JSON parse errors on some advanced VRM extensions. 
-        // We will use a standard anime model miku.glb instead.
+        // Nota: Los archivos VRM son en realidad archivos GLB. Podemos usar GLBLoader.
+        // Sin embargo, gdx-gltf lanza errores de análisis JSON en algunas extensiones VRM avanzadas.
+        // En su lugar, usaremos un modelo de anime estándar miku.glb.
         sceneAsset = new GLBLoader().load(Gdx.files.internal("miku.glb"));
         scene = new Scene(sceneAsset.scene);
         
-        // Model is too big, scale it down
+        // El modelo es demasiado grande, lo escalamos hacia abajo
         scene.modelInstance.transform.scale(0.1f, 0.1f, 0.1f);
         
         sceneManager.addScene(scene);
@@ -85,7 +86,7 @@ public class CellShadingScreen extends Base3DScreen {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        // Slowly rotate scene
+        // Rotar lentamente la escena
         scene.modelInstance.transform.rotate(0, 1, 0, 15f * delta);
 
         sceneManager.update(delta);

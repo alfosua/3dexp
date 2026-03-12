@@ -27,7 +27,7 @@ public class ShadowsScreen extends Base3DScreen {
     private SceneManager sceneManager;
     private DirectionalShadowLight shadowLight;
     
-    // We'll use basic shapes but wrap them in Scene objects to be managed by SceneManager which handles shadows
+    // Usaremos formas básicas pero las envolveremos en objetos Scene para que sean manejados por SceneManager que maneja las sombras
     private Array<Model> models = new Array<Model>();
     private Scene boxScene;
     private Scene sphereScene;
@@ -42,12 +42,12 @@ public class ShadowsScreen extends Base3DScreen {
         PBRShaderConfig config = new PBRShaderConfig();
         DepthShader.Config depthConfig = new DepthShader.Config();
         
-        // SceneManager with default shaders handles shadows automatically if configured
+        // SceneManager con shaders predeterminados maneja las sombras automáticamente si está configurado
         sceneManager = new SceneManager(new PBRShaderProvider(config), new PBRDepthShaderProvider(depthConfig));
         sceneManager.setCamera(cam);
         sceneManager.setAmbientLight(0.3f);
 
-        // Setup Shadow Light
+        // Configurar luz de sombra
         shadowLight = new DirectionalShadowLight(2048, 2048, 60f, 60f, 1f, 300f);
         shadowLight.set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f);
         sceneManager.environment.add(shadowLight);
@@ -55,7 +55,7 @@ public class ShadowsScreen extends Base3DScreen {
 
         ModelBuilder modelBuilder = new ModelBuilder();
 
-        // Floor (Receives shadow)
+        // Suelo (Recibe sombra)
         Material floorMaterial = new Material(ColorAttribute.createDiffuse(Color.WHITE));
         Model floor = modelBuilder.createBox(30f, 0.5f, 30f, floorMaterial, Usage.Position | Usage.Normal);
         models.add(floor);
@@ -63,7 +63,7 @@ public class ShadowsScreen extends Base3DScreen {
         floorScene.modelInstance.transform.setToTranslation(0f, -0.25f, 0f);
         sceneManager.addScene(floorScene);
 
-        // Objects (Cast shadows)
+        // Objetos (Emiten sombras)
         Material objMaterial = new Material(ColorAttribute.createDiffuse(Color.RED));
         Model box = modelBuilder.createBox(2f, 2f, 2f, objMaterial, Usage.Position | Usage.Normal);
         models.add(box);
@@ -84,7 +84,7 @@ public class ShadowsScreen extends Base3DScreen {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        // Rotate objects so you can see shadows move
+        // Rotar objetos para que puedas ver cómo se mueven las sombras
         boxScene.modelInstance.transform.rotate(Vector3.Y, 30f * delta);
         sphereScene.modelInstance.transform.rotate(Vector3.X, 40f * delta);
 

@@ -31,7 +31,7 @@ public class TerrainScreen extends Base3DScreen {
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.ColorUnpacked,
                 new Material());
 
-        // Procedural heightmap using sin and cos
+        // Mapa de alturas procedural usando sin y cos
         float[][] heights = new float[width][depth];
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < depth; z++) {
@@ -39,17 +39,17 @@ public class TerrainScreen extends Base3DScreen {
             }
         }
 
-        // Generate mesh
+        // Generar malla
         for (int x = 0; x < width - 1; x++) {
             for (int z = 0; z < depth - 1; z++) {
                 float h = heights[x][z];
-                // Color based on height to make it look like terrain
+                // Color basado en la altura para que parezca terreno
                 if (h > 2.5f) {
-                    builder.setColor(Color.WHITE); // Snow
+                    builder.setColor(Color.WHITE); // Nieve
                 } else if (h > 0f) {
-                    builder.setColor(Color.valueOf("8B4513")); // Brown (Dirt/Rock)
+                    builder.setColor(Color.valueOf("8B4513")); // Marrón (Tierra/Roca)
                 } else {
-                    builder.setColor(Color.valueOf("228B22")); // Forest Green
+                    builder.setColor(Color.valueOf("228B22")); // Verde Bosque
                 }
 
                 Vector3 v1 = new Vector3(x * scale, heights[x][z], z * scale);
@@ -65,7 +65,7 @@ public class TerrainScreen extends Base3DScreen {
         terrainModel = modelBuilder.end();
         instance = new ModelInstance(terrainModel);
 
-        // Center the terrain
+        // Centrar el terreno
         instance.transform.setToTranslation(-width * scale / 2f, 0, -depth * scale / 2f);
 
         cam.position.set(0f, 20f, 30f);
@@ -86,7 +86,7 @@ public class TerrainScreen extends Base3DScreen {
 
     @Override
     public void render(float delta) {
-        super.render(delta); // clears screen
+        super.render(delta); // limpia la pantalla
 
         camController.update(delta);
 

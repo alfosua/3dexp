@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
@@ -37,13 +38,13 @@ public class SkyboxScreen extends Base3DScreen {
         sceneManager = new SceneManager();
         sceneManager.setCamera(cam);
 
-        // Procedural gradient skybox using Pixmaps
+        // Skybox de gradiente procedural usando Pixmaps
         int resolution = 512;
         
-        // Define colors
-        Color colorZenith = new Color(0.1f, 0.4f, 0.8f, 1f); // Deep blue top
-        Color colorHorizon = new Color(0.8f, 0.9f, 1.0f, 1f); // Hazy white/blue horizon
-        Color colorGround = new Color(0.15f, 0.2f, 0.15f, 1f); // Dark green ground
+        // Definir colores
+        Color colorZenith = new Color(0.1f, 0.4f, 0.8f, 1f); // Parte superior azul oscuro
+        Color colorHorizon = new Color(0.8f, 0.9f, 1.0f, 1f); // Horizonte brumoso blanco/azul
+        Color colorGround = new Color(0.15f, 0.2f, 0.15f, 1f); // Suelo verde oscuro
         
         Pixmap pSky = new Pixmap(resolution, resolution, Pixmap.Format.RGBA8888);
         pSky.setColor(colorZenith);
@@ -53,21 +54,21 @@ public class SkyboxScreen extends Base3DScreen {
         pGround.setColor(colorGround);
         pGround.fill();
         
-        // Create 4 side faces with a smooth vertical gradient
+        // Crear 4 caras laterales con un suave gradiente vertical
         Pixmap sideFace = new Pixmap(resolution, resolution, Pixmap.Format.RGBA8888);
         for (int y = 0; y < resolution; y++) {
             float t = (float) y / (resolution - 1);
-            // In libgdx Pixmap, y=0 is top, y=height is bottom.
-            // When building a Cubemap, the side faces point +Y up.
-            // So y=0 (top) is Zenith, y=resolution (bottom) is Horizon... wait,
-            // actually we want the top half to be sky gradient, bottom half to be ground.
+            // En libgdx Pixmap, y=0 es arriba, y=height es abajo.
+            // Al construir un Cubemap, las caras laterales apuntan a +Y arriba.
+            // Así que y=0 (arriba) es el Cénit, y=resolution (abajo) es el Horizonte... espera,
+            // en realidad queremos que la mitad superior sea un gradiente de cielo, y la mitad inferior sea suelo.
             Color c = new Color();
             if (y < resolution / 2) {
-                // Top half: Zenith down to Horizon
+                // Mitad superior: Del Cénit abajo al Horizonte
                 float blend = (float) y / (resolution / 2 - 1); // 0 to 1
                 c.set(colorZenith).lerp(colorHorizon, blend);
             } else {
-                // Bottom half: Horizon down to Ground
+                // Mitad inferior: Del Horizonte abajo al Suelo
                 float blend = (float) (y - resolution / 2) / (resolution / 2 - 1); // 0 to 1
                 c.set(colorHorizon).lerp(colorGround, blend);
             }
@@ -75,15 +76,15 @@ public class SkyboxScreen extends Base3DScreen {
             sideFace.drawLine(0, y, resolution, y);
         }
 
-        // Right, Left, Top, Bottom, Front, Back
+        // Derecha, Izquierda, Arriba, Abajo, Frente, Atrás
         cubemap = new Cubemap(sideFace, sideFace, pSky, pGround, sideFace, sideFace);
 
-        // create Skybox
+        // crear Skybox
         skybox = new SceneSkybox(cubemap);
         sceneManager.setSkyBox(skybox);
 
         ModelBuilder modelBuilder = new ModelBuilder();
-        Material mat = new Material(com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.createDiffuse(Color.WHITE));
+        Material mat = new Material(ColorAttribute.createDiffuse(Color.WHITE));
         box = modelBuilder.createBox(1f, 1f, 1f, mat, Usage.Position | Usage.Normal);
         boxScene = new Scene(new ModelInstance(box));
         sceneManager.addScene(boxScene);
@@ -93,7 +94,7 @@ public class SkyboxScreen extends Base3DScreen {
 
     @Override
     public void show() {
-        super.show(); // sets up multiplexer for ESC
+        super.show(); // configura multiplexor para ESC
         multiplexer.addProcessor(camController);
     }
 

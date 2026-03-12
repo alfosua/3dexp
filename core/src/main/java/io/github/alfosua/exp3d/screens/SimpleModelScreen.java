@@ -26,9 +26,9 @@ public class SimpleModelScreen extends Base3DScreen {
 
     @Override
     public void render(float delta) {
-        super.render(delta); // clears screen
+        super.render(delta); // limpia la pantalla
 
-        // Slowly rotate the box
+        // Rotar lentamente la caja
         instance.transform.rotate(0, 1, 0, 45f * delta);
 
         modelBatch.begin(cam);

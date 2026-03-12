@@ -12,6 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.Screen;
 import io.github.alfosua.exp3d.Main;
 
 public class MenuScreen extends ScreenAdapter {
@@ -28,11 +31,11 @@ public class MenuScreen extends ScreenAdapter {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        // We will just use the default skin's logic by creating a simple one,
-        // or actually, libgdx doesn't have a built-in default skin file ready without loading assets.
-        // Let's create a minimal programmatic skin or just rely on a simple font for now.
-        // For simplicity, we can use Scene2D but without a loaded skin file we need to generate it, 
-        // which might be tedious. Let's create a basic TextButton style programmatically.
+        // Solo usaremos la lógica del skin predeterminado creando uno simple,
+        // o en realidad, libgdx no tiene un archivo skin predeterminado integrado sin cargar recursos.
+        // Vamos a crear un skin programático mínimo o simplemente dependeremos de una fuente simple por ahora.
+        // Para simplificar, podemos usar Scene2D pero sin un archivo skin cargado necesitamos generarlo,
+        // lo que podría ser tedioso. Creemos un estilo TextButton básico de forma programática.
         
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.font = game.font;
@@ -67,15 +70,15 @@ public class MenuScreen extends ScreenAdapter {
             "16. Large Environment Exploration"
         };
         
-        com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle labelStyle = new com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle();
+        LabelStyle labelStyle = new LabelStyle();
         labelStyle.font = game.font;
 
-        table.add(new com.badlogic.gdx.scenes.scene2d.ui.Label("3D Examples in LibGDX", labelStyle)).padBottom(20).row();
+        table.add(new Label("3D Examples in LibGDX", labelStyle)).padBottom(20).row();
 
         for (int i = 0; i < examples.length; i++) {
             final int index = i;
             if (examples[i].startsWith("--")) {
-                com.badlogic.gdx.scenes.scene2d.ui.Label label = new com.badlogic.gdx.scenes.scene2d.ui.Label(examples[i], labelStyle);
+                Label label = new Label(examples[i], labelStyle);
                 label.setColor(Color.SCARLET);
                 table.add(label).padTop(10).padBottom(5).row();
                 continue;
@@ -92,7 +95,7 @@ public class MenuScreen extends ScreenAdapter {
         
         ScrollPane scrollPane = new ScrollPane(table);
         scrollPane.setFadeScrollBars(false);
-        scrollPane.setScrollingDisabled(true, false); // Disable horizontal scrolling
+        scrollPane.setScrollingDisabled(true, false); // Desactivar el desplazamiento horizontal
         
         rootTable.add(scrollPane).fill().expand().padBottom(10).row();
         
@@ -107,8 +110,8 @@ public class MenuScreen extends ScreenAdapter {
     }
 
     private void launchExample(int index) {
-        // We will implement these one by one.
-        com.badlogic.gdx.Screen nextScreen = null;
+        // Implementaremos estos uno por uno.
+        Screen nextScreen = null;
         switch (index) {
             case 1: nextScreen = new SimpleModelScreen(game); break;
             case 2: nextScreen = new SimpleGltfScreen(game); break;

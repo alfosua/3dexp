@@ -87,14 +87,14 @@ public class PhysicsScreen extends Base3DScreen {
         Model model = mb.end();
         models.add(model);
 
-        // Floor physics
+        // Físicas del suelo
         floorShape = new btBoxShape(new Vector3(50f, 0.5f, 50f));
         btRigidBody.btRigidBodyConstructionInfo floorInfo = new btRigidBody.btRigidBodyConstructionInfo(0f, null, floorShape, Vector3.Zero);
         GameObject floor = new GameObject(model, "floor", floorInfo);
         dynamicsWorld.addRigidBody(floor.body);
         instances.add(floor);
 
-        // Falling boxes physics
+        // Físicas de las cajas cayendo
         boxShape = new btBoxShape(new Vector3(1f, 1f, 1f));
         Vector3 localInertia = new Vector3();
         boxShape.calculateLocalInertia(1f, localInertia);
@@ -104,7 +104,7 @@ public class PhysicsScreen extends Base3DScreen {
             GameObject box = new GameObject(model, "box", boxInfo);
             box.transform.setToTranslation((float) Math.random() * 10 - 5, 20f + i * 4f, (float) Math.random() * 10 - 5);
             
-            // Randomize rotation
+            // Aleatorizar rotación
             box.transform.rotate(Vector3.X, (float)Math.random() * 360f);
             box.transform.rotate(Vector3.Y, (float)Math.random() * 360f);
             box.transform.rotate(Vector3.Z, (float)Math.random() * 360f);
@@ -124,7 +124,7 @@ public class PhysicsScreen extends Base3DScreen {
 
     @Override
     public void render(float delta) {
-        super.render(delta); // clears screen
+        super.render(delta); // limpia la pantalla
         dynamicsWorld.stepSimulation(delta, 5, 1f / 60f);
 
         modelBatch.begin(cam);

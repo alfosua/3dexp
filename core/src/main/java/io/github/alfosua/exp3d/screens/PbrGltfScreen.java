@@ -9,6 +9,7 @@ import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.loaders.glb.GLBLoader;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
+import com.badlogic.gdx.graphics.g3d.RenderableProvider;
 
 public class PbrGltfScreen extends Base3DScreen {
     private SceneManager sceneManager;
@@ -21,7 +22,7 @@ public class PbrGltfScreen extends Base3DScreen {
         sceneManager = new SceneManager();
         sceneManager.setCamera(cam);
 
-        // Standard setup for PBR
+        // Configuración estándar para PBR
         DirectionalLightEx light = new DirectionalLightEx();
         light.direction.set(1, -2, -1).nor();
         light.color.set(Color.WHITE);
@@ -29,7 +30,7 @@ public class PbrGltfScreen extends Base3DScreen {
 
         sceneManager.setAmbientLight(1f);
 
-        // Load photorealistic model
+        // Cargar modelo fotorrealista
         sceneAsset = new GLBLoader().load(Gdx.files.internal("DamagedHelmet.glb"));
         scene = new Scene(sceneAsset.scene);
         sceneManager.addScene(scene);
@@ -44,8 +45,8 @@ public class PbrGltfScreen extends Base3DScreen {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        // Rotate scenes around Y axis slowly
-        for (com.badlogic.gdx.graphics.g3d.RenderableProvider provider : sceneManager.getRenderableProviders()) {
+        // Rotar las escenas alrededor del eje Y lentamente
+        for (RenderableProvider provider : sceneManager.getRenderableProviders()) {
             if (provider instanceof Scene) {
                 ((Scene) provider).modelInstance.transform.rotate(0, 1, 0, 15f * delta);
             }

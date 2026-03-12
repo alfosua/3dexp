@@ -42,7 +42,7 @@ public class SimpleGltfScreen extends Base3DScreen {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        // Slowly rotate the model
+        // Rotar lentamente el modelo
         scene.modelInstance.transform.rotate(0, 1, 0, 30f * delta);
 
         sceneManager.update(delta);
