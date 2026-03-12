@@ -17,7 +17,6 @@ public class SimpleGltfScreen extends Base3DScreen {
 
     public SimpleGltfScreen(Main game) {
         super(game);
-
         sceneManager = new SceneManager();
         sceneManager.setCamera(cam);
 
@@ -25,9 +24,9 @@ public class SimpleGltfScreen extends Base3DScreen {
         light.direction.set(1, -2, -1).nor();
         light.color.set(Color.WHITE);
         sceneManager.environment.add(light);
-        
         sceneManager.setAmbientLight(1f);
 
+        // Asegúrate de tener Duck.glb en tu carpeta assets
         sceneAsset = new GLBLoader().load(Gdx.files.internal("Duck.glb"));
         scene = new Scene(sceneAsset.scene);
         sceneManager.addScene(scene);
@@ -42,7 +41,6 @@ public class SimpleGltfScreen extends Base3DScreen {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        // Rotar lentamente el modelo
         scene.modelInstance.transform.rotate(0, 1, 0, 30f * delta);
 
         sceneManager.update(delta);

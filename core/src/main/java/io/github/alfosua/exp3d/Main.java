@@ -1,9 +1,8 @@
 package io.github.alfosua.exp3d;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import io.github.alfosua.exp3d.screens.MenuScreen;
 
@@ -15,18 +14,17 @@ public class Main extends Game {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        font = new BitmapFont(); // use default font
+        font = new BitmapFont();
         shapeRenderer = new ShapeRenderer();
-        
+
+        // Inicializamos Bullet aquí
         com.badlogic.gdx.physics.bullet.Bullet.init();
 
-        // Go to menu
         this.setScreen(new MenuScreen(this));
     }
 
     @Override
     public void render() {
-        // important!
         super.render();
     }
 
@@ -35,8 +33,6 @@ public class Main extends Game {
         batch.dispose();
         font.dispose();
         shapeRenderer.dispose();
-        if (screen != null) {
-            screen.dispose();
-        }
+        if (screen != null) screen.dispose();
     }
 }

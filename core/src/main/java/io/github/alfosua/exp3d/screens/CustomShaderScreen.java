@@ -25,26 +25,26 @@ public class CustomShaderScreen extends Base3DScreen {
     private ModelBatch customBatch;
 
     private String vert = "attribute vec3 a_position;\n" +
-            "uniform mat4 u_projViewTrans;\n" +
-            "uniform mat4 u_worldTrans;\n" +
-            "varying vec3 v_pos;\n" +
-            "void main() {\n" +
-            "    vec4 pos = u_worldTrans * vec4(a_position, 1.0);\n" +
-            "    v_pos = pos.xyz;\n" +
-            "    gl_Position = u_projViewTrans * pos;\n" +
-            "}";
+        "uniform mat4 u_projViewTrans;\n" +
+        "uniform mat4 u_worldTrans;\n" +
+        "varying vec3 v_pos;\n" +
+        "void main() {\n" +
+        "    vec4 pos = u_worldTrans * vec4(a_position, 1.0);\n" +
+        "    v_pos = pos.xyz;\n" +
+        "    gl_Position = u_projViewTrans * pos;\n" +
+        "}";
 
     private String frag = "#ifdef GL_ES\n" +
-            "precision mediump float;\n" +
-            "#endif\n" +
-            "uniform float u_time;\n" +
-            "varying vec3 v_pos;\n" +
-            "void main() {\n" +
-            "    float r = sin(v_pos.x * 2.0 + u_time * 2.0) * 0.5 + 0.5;\n" +
-            "    float g = cos(v_pos.y * 3.0 + u_time) * 0.5 + 0.5;\n" +
-            "    float b = sin(v_pos.z * 1.5 - u_time * 1.5) * 0.5 + 0.5;\n" +
-            "    gl_FragColor = vec4(r, g, b, 1.0);\n" +
-            "}";
+        "precision mediump float;\n" +
+        "#endif\n" +
+        "uniform float u_time;\n" +
+        "varying vec3 v_pos;\n" +
+        "void main() {\n" +
+        "    float r = sin(v_pos.x * 2.0 + u_time * 2.0) * 0.5 + 0.5;\n" +
+        "    float g = cos(v_pos.y * 3.0 + u_time) * 0.5 + 0.5;\n" +
+        "    float b = sin(v_pos.z * 1.5 - u_time * 1.5) * 0.5 + 0.5;\n" +
+        "    gl_FragColor = vec4(r, g, b, 1.0);\n" +
+        "}";
 
     public CustomShaderScreen(Main game) {
         super(game);
@@ -107,11 +107,11 @@ public class CustomShaderScreen extends Base3DScreen {
 
         ModelBuilder modelBuilder = new ModelBuilder();
         model = modelBuilder.createSphere(5f, 5f, 5f, 32, 32,
-                new Material(),
-                VertexAttributes.Usage.Position);
+            new Material(),
+            VertexAttributes.Usage.Position);
 
         instance = new ModelInstance(model);
-        
+
         cam.position.set(10f, 10f, 10f);
         cam.lookAt(0,0,0);
         cam.update();

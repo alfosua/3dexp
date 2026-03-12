@@ -36,7 +36,7 @@ public class MenuScreen extends ScreenAdapter {
         // Vamos a crear un skin programático mínimo o simplemente dependeremos de una fuente simple por ahora.
         // Para simplificar, podemos usar Scene2D pero sin un archivo skin cargado necesitamos generarlo,
         // lo que podría ser tedioso. Creemos un estilo TextButton básico de forma programática.
-        
+
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.font = game.font;
 
@@ -67,9 +67,11 @@ public class MenuScreen extends ScreenAdapter {
             "14. Cell Shaded Anime Character",
             "-- Advanced Environments --",
             "15. Simple Physics sandbox with Bullet",
-            "16. Large Environment Exploration"
+            "16. Advanced Physics, shapes and forces",
+            "17. Raycasting",
+            "18. Large Environment Exploration"
         };
-        
+
         LabelStyle labelStyle = new LabelStyle();
         labelStyle.font = game.font;
 
@@ -92,13 +94,13 @@ public class MenuScreen extends ScreenAdapter {
             });
             table.add(button).pad(2).row();
         }
-        
+
         ScrollPane scrollPane = new ScrollPane(table);
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false); // Desactivar el desplazamiento horizontal
-        
+
         rootTable.add(scrollPane).fill().expand().padBottom(10).row();
-        
+
         TextButton exitButton = new TextButton("Exit", textButtonStyle);
         exitButton.addListener(new ChangeListener() {
             @Override
@@ -128,7 +130,9 @@ public class MenuScreen extends ScreenAdapter {
             case 16: nextScreen = new CustomShaderScreen(game); break;
             case 17: nextScreen = new CellShadingScreen(game); break;
             case 19: nextScreen = new PhysicsScreen(game); break;
-            case 20: nextScreen = new EnvironmentScreen(game); break;
+            case 20: nextScreen = new SandboxScreen(game); break;
+            case 21: nextScreen = new RaycastingScreen(game); break;
+            case 22: nextScreen = new EnvironmentScreen(game); break;
         }
         if (nextScreen != null) {
             game.getScreen().dispose();

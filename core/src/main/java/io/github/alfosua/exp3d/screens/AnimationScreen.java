@@ -17,24 +17,23 @@ public class AnimationScreen extends Base3DScreen {
 
     public AnimationScreen(Main game) {
         super(game);
-        
         sceneManager = new SceneManager();
         sceneManager.setCamera(cam);
-        
-        // Cargar GLTF
+
+        // Usamos GLTFLoader para archivos .gltf (texto/json)
         sceneAsset = new GLTFLoader().load(Gdx.files.internal("BoxAnimated.gltf"));
         scene = new Scene(sceneAsset.scene);
         sceneManager.addScene(scene);
-        
+
+        // Reproducir la primera animación en bucle
         if (sceneAsset.animations.size > 0) {
             scene.animationController.setAnimation(sceneAsset.animations.first().id, -1);
         }
-        
+
         cam.position.set(4f, 4f, 4f);
         cam.lookAt(0, 0, 0);
         cam.update();
 
-        // configurar luz
         DirectionalLightEx light = new DirectionalLightEx();
         light.direction.set(1, -3, 1).nor();
         light.color.set(Color.WHITE);
@@ -49,11 +48,11 @@ public class AnimationScreen extends Base3DScreen {
         sceneManager.update(delta);
         sceneManager.render();
     }
-    
+
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
-        // sceneManager.updateViewport(width, height);
+        sceneManager.updateViewport(width, height);
     }
 
     @Override

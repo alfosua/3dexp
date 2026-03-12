@@ -11,24 +11,20 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import io.github.alfosua.exp3d.Main;
 
 public class ModelBuildersScreen extends Base3DScreen {
-
     private Array<Model> models = new Array<Model>();
     private Array<ModelInstance> instances = new Array<ModelInstance>();
 
     public ModelBuildersScreen(Main game) {
         super(game);
-
         cam.position.set(0f, 5f, 15f);
         cam.lookAt(0, 0, 0);
         cam.update();
 
         ModelBuilder modelBuilder = new ModelBuilder();
 
-        // 1. Caja
         Material boxMaterial = new Material(ColorAttribute.createDiffuse(Color.RED));
         Model box = modelBuilder.createBox(2f, 2f, 2f, boxMaterial, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
         ModelInstance boxInstance = new ModelInstance(box);
@@ -36,7 +32,6 @@ public class ModelBuildersScreen extends Base3DScreen {
         models.add(box);
         instances.add(boxInstance);
 
-        // 2. Esfera
         Material sphereMaterial = new Material(ColorAttribute.createDiffuse(Color.GREEN));
         Model sphere = modelBuilder.createSphere(2f, 2f, 2f, 20, 20, sphereMaterial, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
         ModelInstance sphereInstance = new ModelInstance(sphere);
@@ -44,7 +39,6 @@ public class ModelBuildersScreen extends Base3DScreen {
         models.add(sphere);
         instances.add(sphereInstance);
 
-        // 3. Cilindro
         Material cylinderMaterial = new Material(ColorAttribute.createDiffuse(Color.BLUE));
         Model cylinder = modelBuilder.createCylinder(2f, 4f, 2f, 20, cylinderMaterial, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
         ModelInstance cylinderInstance = new ModelInstance(cylinder);
@@ -52,7 +46,6 @@ public class ModelBuildersScreen extends Base3DScreen {
         models.add(cylinder);
         instances.add(cylinderInstance);
 
-        // 4. Cápsula
         Material capsuleMaterial = new Material(ColorAttribute.createDiffuse(Color.YELLOW));
         Model capsule = modelBuilder.createCapsule(1f, 4f, 20, capsuleMaterial, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
         ModelInstance capsuleInstance = new ModelInstance(capsule);
@@ -60,7 +53,6 @@ public class ModelBuildersScreen extends Base3DScreen {
         models.add(capsule);
         instances.add(capsuleInstance);
 
-        // 5. Cono
         Material coneMaterial = new Material(ColorAttribute.createDiffuse(Color.MAGENTA));
         Model cone = modelBuilder.createCone(2f, 4f, 2f, 20, coneMaterial, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
         ModelInstance coneInstance = new ModelInstance(cone);
@@ -74,7 +66,6 @@ public class ModelBuildersScreen extends Base3DScreen {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        // Rotar lentamente todas las instancias para una mejor visualización
         for (ModelInstance instance : instances) {
             instance.transform.rotate(Vector3.Y, 30f * delta);
             instance.transform.rotate(Vector3.X, 15f * delta);
@@ -88,9 +79,7 @@ public class ModelBuildersScreen extends Base3DScreen {
     @Override
     public void dispose() {
         super.dispose();
-        for (Model model : models) {
-            model.dispose();
-        }
+        for (Model model : models) model.dispose();
         models.clear();
     }
 }

@@ -17,12 +17,11 @@ public abstract class Base3DScreen extends ScreenAdapter {
     protected PerspectiveCamera cam;
     protected ModelBatch modelBatch;
     protected Environment environment;
+    protected com.badlogic.gdx.InputMultiplexer multiplexer;
 
     public Base3DScreen(Main game) {
         this.game = game;
-        
         modelBatch = new ModelBatch();
-        
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
@@ -33,13 +32,12 @@ public abstract class Base3DScreen extends ScreenAdapter {
         cam.near = 1f;
         cam.far = 300f;
         cam.update();
-    }
 
-    protected com.badlogic.gdx.InputMultiplexer multiplexer;
+        multiplexer = new com.badlogic.gdx.InputMultiplexer();
+    }
 
     @Override
     public void show() {
-        multiplexer = new com.badlogic.gdx.InputMultiplexer();
         multiplexer.addProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {

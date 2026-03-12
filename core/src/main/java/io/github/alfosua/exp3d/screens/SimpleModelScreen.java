@@ -17,18 +17,17 @@ public class SimpleModelScreen extends Base3DScreen {
         super(game);
 
         ModelBuilder modelBuilder = new ModelBuilder();
-        model = modelBuilder.createBox(5f, 5f, 5f, 
-                new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        
+        model = modelBuilder.createBox(5f, 5f, 5f,
+            new Material(ColorAttribute.createDiffuse(Color.GREEN)),
+            VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+
         instance = new ModelInstance(model);
     }
 
     @Override
     public void render(float delta) {
-        super.render(delta); // limpia la pantalla
+        super.render(delta);
 
-        // Rotar lentamente la caja
         instance.transform.rotate(0, 1, 0, 45f * delta);
 
         modelBatch.begin(cam);
@@ -38,6 +37,7 @@ public class SimpleModelScreen extends Base3DScreen {
 
     @Override
     public void dispose() {
+        // ¡Importante! Liberar la memoria del modelo cuando ya no se usa
         if (model != null) {
             model.dispose();
             model = null;

@@ -35,31 +35,31 @@ public class CellShadingScreen extends Base3DScreen {
         // para posterizar el color final. Inyectamos un fragmento al final del shader.
         PBRShaderConfig config = new PBRShaderConfig();
         config.numBones = 60; // El modelo de Miku requiere 52 huesos
-        
+
         // Interceptamos de forma segura el cálculo del color de iluminación sin romper la estructura del bloque `#if` de GLSL
         String defaultFrag = PBRShaderProvider.getDefaultFragmentShader();
-        
+
         defaultFrag = defaultFrag.replace(
             "vec3 color = ambientColor + f_diffuse + f_specular;",
             "vec3 rawLight = f_diffuse / max(baseColor.rgb, 0.001);\n" +
-            "    float lightInt = max(max(rawLight.r, rawLight.g), rawLight.b);\n" +
-            "    float toonLight = lightInt > 0.4 ? 1.1 : (lightInt > 0.1 ? 0.7 : 0.4);\n" +
-            "    vec3 color = ambientColor + (baseColor.rgb * toonLight);\n" +
-            "    float specInt = max(max(f_specular.r, f_specular.g), f_specular.b);\n" +
-            "    if (specInt > 0.1) color += mix(baseColor.rgb, vec3(1.0), 0.3);"
+                "    float lightInt = max(max(rawLight.r, rawLight.g), rawLight.b);\n" +
+                "    float toonLight = lightInt > 0.4 ? 1.1 : (lightInt > 0.1 ? 0.7 : 0.4);\n" +
+                "    vec3 color = ambientColor + (baseColor.rgb * toonLight);\n" +
+                "    float specInt = max(max(f_specular.r, f_specular.g), f_specular.b);\n" +
+                "    if (specInt > 0.1) color += mix(baseColor.rgb, vec3(1.0), 0.3);"
         );
-        
+
         config.fragmentShader = defaultFrag;
 
         DepthShader.Config depthConfig = new DepthShader.Config();
         depthConfig.numBones = 60;
-        
+
         // Proporcionar la configuración personalizada al SceneManager
         sceneManager = new SceneManager(new PBRShaderProvider(config), new PBRDepthShaderProvider(depthConfig));
         sceneManager.setCamera(cam);
 
         sceneManager.setAmbientLight(0.4f);
-        
+
         DirectionalLightEx light = new DirectionalLightEx();
         light.direction.set(1, -1, -0.5f).nor();
         light.color.set(Color.WHITE);
@@ -70,10 +70,10 @@ public class CellShadingScreen extends Base3DScreen {
         // En su lugar, usaremos un modelo de anime estándar miku.glb.
         sceneAsset = new GLBLoader().load(Gdx.files.internal("miku.glb"));
         scene = new Scene(sceneAsset.scene);
-        
+
         // El modelo es demasiado grande, lo escalamos hacia abajo
         scene.modelInstance.transform.scale(0.1f, 0.1f, 0.1f);
-        
+
         sceneManager.addScene(scene);
 
         cam.position.set(0f, 1f, 2f);

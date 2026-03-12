@@ -1,5 +1,7 @@
 package io.github.alfosua.exp3d.screens;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -10,6 +12,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.*;
@@ -17,14 +20,13 @@ import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
 import com.badlogic.gdx.utils.Array;
 import io.github.alfosua.exp3d.Main;
 
-public class PhysicsScreen extends Base3DScreen {
+public class RaycastingScreen extends Base3DScreen {
     private btCollisionConfiguration collisionConfig;
     private btDispatcher dispatcher;
     private btBroadphaseInterface broadphase;
     private btConstraintSolver solver;
     private btDynamicsWorld dynamicsWorld;
-    private btCollisionShape floorShape;
-    private btCollisionShape boxShape;
+    private btCollisionShape sphereShape;
 
     private Array<Model> models = new Array<>();
     private Array<GameObject> instances = new Array<>();
@@ -53,7 +55,7 @@ public class PhysicsScreen extends Base3DScreen {
         @Override public void setWorldTransform(Matrix4 worldTrans) { transform.set(worldTrans); }
     }
 
-    public PhysicsScreen(Main game) {
+    public RaycastingScreen(Main game) {
         super(game);
 
         collisionConfig = new btDefaultCollisionConfiguration();
@@ -61,50 +63,56 @@ public class PhysicsScreen extends Base3DScreen {
         broadphase = new btDbvtBroadphase();
         solver = new btSequentialImpulseConstraintSolver();
         dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
-        dynamicsWorld.setGravity(new Vector3(0, -9.81f, 0));
+        dynamicsWorld.setGravity(new Vector3(0, 0, 0));
 
         ModelBuilder mb = new ModelBuilder();
         mb.begin();
-        mb.node().id = "floor";
-        mb.part("floor", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
-                new Material(ColorAttribute.createDiffuse(Color.DARK_GRAY)))
-            .box(100f, 1f, 100f);
-        mb.node().id = "box";
-        mb.part("box", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
-                new Material(ColorAttribute.createDiffuse(Color.RED)))
-            .box(2f, 2f, 2f);
+        mb.node().id = "sphere";
+        mb.part("sphere", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
+            new Material(ColorAttribute.createDiffuse(Color.RED))).sphere(2f, 2f, 2f, 20, 20);
         Model model = mb.end();
         models.add(model);
 
-        floorShape = new btBoxShape(new Vector3(50f, 0.5f, 50f));
-        btRigidBody.btRigidBodyConstructionInfo floorInfo = new btRigidBody.btRigidBodyConstructionInfo(0f, null, floorShape, Vector3.Zero);
-        GameObject floor = new GameObject(model, "floor", floorInfo);
-        dynamicsWorld.addRigidBody(floor.body);
-        instances.add(floor);
+        sphereShape = new btSphereShape(1f);
+        btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(0f, null, sphereShape, Vector3.Zero);
 
-        boxShape = new btBoxShape(new Vector3(1f, 1f, 1f));
-        Vector3 localInertia = new Vector3();
-        boxShape.calculateLocalInertia(1f, localInertia);
-        btRigidBody.btRigidBodyConstructionInfo boxInfo = new btRigidBody.btRigidBodyConstructionInfo(1f, null, boxShape, localInertia);
-
-        for (int i = 0; i < 30; i++) {
-            GameObject box = new GameObject(model, "box", boxInfo);
-            box.transform.setToTranslation((float) Math.random() * 10 - 5, 20f + i * 4f, (float) Math.random() * 10 - 5);
-            box.transform.rotate(Vector3.X, (float)Math.random() * 360f);
-            box.transform.rotate(Vector3.Y, (float)Math.random() * 360f);
-            box.transform.rotate(Vector3.Z, (float)Math.random() * 360f);
-            box.body.setWorldTransform(box.transform);
-            dynamicsWorld.addRigidBody(box.body);
-            instances.add(box);
+        for (int i = 0; i < 5; i++) {
+            GameObject sphere = new GameObject(model, "sphere", info);
+            sphere.transform.setToTranslation(-8f + (i * 4f), 0f, 0f);
+            sphere.body.setWorldTransform(sphere.transform);
+            sphere.body.setUserValue(i);
+            dynamicsWorld.addRigidBody(sphere.body);
+            instances.add(sphere);
         }
-        floorInfo.dispose();
-        boxInfo.dispose();
+        info.dispose();
+
+        multiplexer.addProcessor(new InputAdapter() {
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                Ray ray = cam.getPickRay(screenX, screenY);
+                Vector3 rayFrom = new Vector3(ray.origin);
+                Vector3 rayTo = new Vector3(ray.direction).scl(100f).add(rayFrom);
+
+                ClosestRayResultCallback callback = new ClosestRayResultCallback(rayFrom, rayTo);
+                dynamicsWorld.rayTest(rayFrom, rayTo, callback);
+
+                if (callback.hasHit()) {
+                    btCollisionObject hitObject = callback.getCollisionObject();
+                    int index = hitObject.getUserValue();
+                    if (index >= 0 && index < instances.size) {
+                        instances.get(index).materials.get(0).set(ColorAttribute.createDiffuse(Color.GREEN));
+                    }
+                }
+                callback.dispose();
+                return true;
+            }
+        });
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
-        dynamicsWorld.stepSimulation(delta, 5, 1f / 60f);
+        dynamicsWorld.stepSimulation(delta, 5, 1f/60f);
         modelBatch.begin(cam);
         for (GameObject obj : instances) {
             modelBatch.render(obj, environment);
@@ -119,8 +127,7 @@ public class PhysicsScreen extends Base3DScreen {
             obj.dispose();
         }
         instances.clear();
-        if (floorShape != null) floorShape.dispose();
-        if (boxShape != null) boxShape.dispose();
+        if (sphereShape != null) sphereShape.dispose();
         dynamicsWorld.dispose();
         solver.dispose();
         broadphase.dispose();

@@ -13,39 +13,30 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.environment.SpotLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
 import io.github.alfosua.exp3d.Main;
 
 public class LightingScreen extends Base3DScreen {
-
     private Array<Model> models = new Array<Model>();
     private Array<ModelInstance> instances = new Array<ModelInstance>();
 
     public LightingScreen(Main game) {
         super(game);
-
         cam.position.set(0f, 5f, 15f);
         cam.lookAt(0, 0, 0);
         cam.update();
 
-        // Sobrescribir el entorno de Base3DScreen para probar las luces
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.1f, 0.1f, 0.1f, 1f));
-
-        // 1. Luz Direccional (Como el sol, luz mayormente azulada)
+        // Sol azulado tenue
         environment.add(new DirectionalLight().set(0.2f, 0.2f, 0.5f, -1f, -0.8f, -0.2f));
-
-        // 2. Luz Puntual (Omnidireccional, como una bombilla) - Rojiza
+        // Bombilla roja a la izquierda
         environment.add(new PointLight().set(1f, 0f, 0f, -4f, 2f, 4f, 20f));
-
-        // 3. Luz Foco (En forma de cono) - Verdosa
+        // Linterna verde apuntando hacia abajo a la derecha
         environment.add(new SpotLight().set(0f, 1f, 0f, 4f, 5f, 0f, 0f, -1f, 0f, 20f, 10f, 25f));
 
         ModelBuilder modelBuilder = new ModelBuilder();
 
-        // Suelo
         Material floorMaterial = new Material(ColorAttribute.createDiffuse(Color.WHITE));
         Model floor = modelBuilder.createBox(20f, 0.5f, 20f, floorMaterial, Usage.Position | Usage.Normal);
         ModelInstance floorInstance = new ModelInstance(floor);
@@ -53,9 +44,8 @@ public class LightingScreen extends Base3DScreen {
         models.add(floor);
         instances.add(floorInstance);
 
-        // Algunos objetos para atrapar la luz
         Material objMaterial = new Material(ColorAttribute.createDiffuse(Color.LIGHT_GRAY));
-        
+
         Model box = modelBuilder.createBox(2f, 2f, 2f, objMaterial, Usage.Position | Usage.Normal);
         ModelInstance boxInstance = new ModelInstance(box);
         boxInstance.transform.setToTranslation(-4f, 1f, 0f);
@@ -88,9 +78,7 @@ public class LightingScreen extends Base3DScreen {
     @Override
     public void dispose() {
         super.dispose();
-        for (Model model : models) {
-            model.dispose();
-        }
+        for (Model model : models) model.dispose();
         models.clear();
     }
 }

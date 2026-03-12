@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-
 import com.badlogic.gdx.math.Vector3;
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
 import net.mgsx.gltf.scene3d.attributes.PBRFloatAttribute;
@@ -18,11 +17,9 @@ import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.scene3d.scene.SceneSkybox;
-
 import io.github.alfosua.exp3d.Main;
 
 public class ReflectionScreen extends Base3DScreen {
-
     private SceneManager sceneManager;
     private SceneSkybox skybox;
     private Cubemap cubemap;
@@ -30,7 +27,6 @@ public class ReflectionScreen extends Base3DScreen {
 
     public ReflectionScreen(Main game) {
         super(game);
-
         cam.position.set(0f, 0f, 5f);
         cam.lookAt(0, 0, 0);
         cam.update();
